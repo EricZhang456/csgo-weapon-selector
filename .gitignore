@@ -1,0 +1,5 @@
+scripting/compiled/
+plugins/
+scripting/spcomp*
+scripting/compile*
+.vscode/

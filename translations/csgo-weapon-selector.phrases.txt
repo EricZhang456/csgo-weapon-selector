@@ -1,0 +1,87 @@
+"Phrases"
+{
+    "CSGO_WEAPONSELECT_HINT"
+    {
+        "en"    "Type !selectweapon to select weapons."
+    }
+    "CSGO_WEAPONSELECT_PREF_MENU"
+    {
+        "en"    "Show weapon select hint"
+    }
+    "CSGO_WEAPONSELECT_MENU"
+    {
+        "en"    "Select Weapon"
+    }
+    "CSGO_WEAPONSELECT_MENU_SELECTED"
+    {
+        "en"    "%s (Selected)"
+    }
+    "CSGO_WEAPONSELECT_POWERFUL_PISTOL"
+    {
+        "en"    "Desert Eagle / R8 Revolver"
+    }
+    "CSGO_WEAPONSELECT_DEAGLE"
+    {
+        "en"    "Desert Eagle"
+    }
+    "CSGO_WEAPONSELECT_R8"
+    {
+        "en"    "R8 Revolver"
+    }
+    "CSGO_WEAPONSELECT_CT_START_PISTOL"
+    {
+        "en"    "P2000 / USP-S"
+    }
+    "CSGO_WEAPONSELECT_P2000"
+    {
+        "en"    "P2000"
+    }
+    "CSGO_WEAPONSELECT_USPS"
+    {
+        "en"    "USP-S"
+    }
+    "CSGO_WEAPONSELECT_AUTO_PISTOL_T"
+    {
+        "en"    "CZ75-Auto / Tec-9 (Terrorists)"
+    }
+    "CSGO_WEAPONSELECT_AUTO_PISTOL_CT"
+    {
+        "en"    "CZ75-Auto / Five-SeveN (Counter-Terrorists)"
+    }
+    "CSGO_WEAPONSELECT_CZ75"
+    {
+        "en"    "CZ75-Auto"
+    }
+    "CSGO_WEAPONSELECT_TEC9"
+    {
+        "en"    "Tec-9"
+    }
+    "CSGO_WEAPONSELECT_FIVESEVEN"
+    {
+        "en"    "Five-SeveN"
+    }
+    "CSGO_WEAPONSELECT_MP"
+    {
+        "en"    "MP7 / MP5-SD"
+    }
+    "CSGO_WEAPONSELECT_MP7"
+    {
+        "en"    "MP7"
+    }
+    "CSGO_WEAPONSELECT_MP5SD"
+    {
+        "en"    "MP5-SD"
+    }
+    "CSGO_WEAPONSELECT_AR15"
+    {
+        "en"    "M4A4 / M4A1-S"
+    }
+    "CSGO_WEAPONSELECT_M4A4"
+    {
+        "en"    "M4A4"
+    }
+    "CSGO_WEAPONSELECT_M4A1S"
+    {
+        "en"    "M4A1-S"
+    }
+}
