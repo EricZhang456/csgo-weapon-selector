@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CSGO Weapon Selector",
     author = "Eric Zhang",
     description = "Select CSGO weapon",
-    version = "1.1",
+    version = "1.3",
     url = "https://ericaftereric.top"
 };
 
@@ -120,6 +120,38 @@ public void OnHintCookieMenu(int client, CookieMenuAction action, any info, char
     }
 }
 
+void CheckUserDefault(int client) {
+    // give users a reasonable default first
+    char userPref[BASE_STR_LEN];
+    cookiePowerfulPistol.Get(client, userPref, sizeof(userPref));
+    LogMessage("cookiePowerfulPistolresult: %s", userPref);
+    LogMessage("cookiePowerfulPistolstrlen: %d", strlen(userPref));
+    if (!strlen(userPref)) {
+        LogMessage("hi");
+        cookiePowerfulPistol.Set(client, DEAGLE_NAME);
+    }
+    cookieCTStartPistol.Get(client, userPref, sizeof(userPref));
+    if (!strlen(userPref)) {
+        cookieCTStartPistol.Set(client, P2000_NAME);
+    }
+    cookieAutoPistolT.Get(client, userPref, sizeof(userPref));
+    if (!strlen(userPref)) {
+        cookieAutoPistolT.Set(client, TEC9_NAME);
+    }
+    cookieAutoPistolCT.Get(client, userPref, sizeof(userPref));
+    if (!strlen(userPref)) {
+        cookieAutoPistolCT.Set(client, FIVE_SEVEN_NAME);
+    }
+    cookieMP.Get(client, userPref, sizeof(userPref));
+    if (!strlen(userPref)) {
+        cookieMP.Set(client, MP7_NAME);
+    }
+    cookieAR15.Get(client, userPref, sizeof(userPref));
+    if (!strlen(userPref)) {
+        cookieAR15.Set(client, M4A4_NAME);
+    }
+}
+
 public void Event_PlayerTeam(Event event, const char[] name, bool dontBroadcast) {
     int client = GetClientOfUserId(event.GetInt("userid"));
     if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client)) {
@@ -127,6 +159,9 @@ public void Event_PlayerTeam(Event event, const char[] name, bool dontBroadcast)
     }
     if (cookieNoHintWhenEnter.GetInt(client, cvarShowHintByDefault.BoolValue ? 1 : 0)) {
         PrintToChat(client, "%t", "CSGO_WEAPONSELECT_HINT");
+    }
+    if (AreClientCookiesCached(client)) {
+        CheckUserDefault(client);
     }
 }
 
@@ -323,7 +358,7 @@ void ShowSecondMenu(int client, const char[] type) {
             char tec9Display[BASE_STR_LEN];
             Format(tec9Display, sizeof(tec9Display), "%T", "CSGO_WEAPONSELECT_MENU_SELECTED", client, tec9);
             menu.AddItem(CZ_T_NAME, cz75);
-            menu.AddItem(TEC9_NAME, tec9, ITEMDRAW_DISABLED);
+            menu.AddItem(TEC9_NAME, tec9Display, ITEMDRAW_DISABLED);
         } else {
             menu.AddItem(CZ_T_NAME, cz75);
             menu.AddItem(TEC9_NAME, tec9);
@@ -390,6 +425,7 @@ void ShowSecondMenu(int client, const char[] type) {
         SetFailState("Invalid type %s passed to ShowSecondMenu, something has gone horribly wrong", type);
         return;
     }
+    menu.AddItem("_type", type, ITEMDRAW_IGNORE);
     menu.ExitBackButton = true;
     menu.Display(client, MENU_TIME_FOREVER);
 }
@@ -413,6 +449,22 @@ public void Menu_SecondMenuHandler(Menu menu, MenuAction action, int param1, int
             char info[BASE_STR_LEN];
             menu.GetItem(param2, info, sizeof(info));
             ApplyWeaponPref(param1, info);
+            char type[BASE_STR_LEN];
+            for (int i = 0; i < menu.ItemCount; i++) {
+                char itemInfo[BASE_STR_LEN], itemDisplay[BASE_STR_LEN];
+                menu.GetItem(i, itemInfo, sizeof(itemInfo), _, itemDisplay, sizeof(itemDisplay));
+                if (StrEqual(itemInfo, "_type")) {
+                    strcopy(type, sizeof(type), itemDisplay);
+                    break;
+                }
+            }
+            if (!strlen(type)) {
+                SetFailState("Secondary menu has no type info!");
+            }
+#if defined DEBUG
+            LogMessage("This is menu type %s shown", type);
+#endif
+            ShowSecondMenu(param1, type);
         }
         case MenuAction_Cancel: {
             if (param2 == MenuCancel_ExitBack) {
