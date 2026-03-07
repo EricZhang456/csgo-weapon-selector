@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CSGO Weapon Selector",
     author = "Eric Zhang",
     description = "Select CSGO weapon",
-    version = "1.3",
+    version = "1.3.1",
     url = "https://ericaftereric.top"
 };
 
@@ -104,6 +104,8 @@ public void OnPluginStart() {
     cookieNoHintWhenEnter.SetPrefabMenu(CookieMenu_OnOff_Int, "Show weapon select hint", OnHintCookieMenu);
 
     HookEvent("player_team", Event_PlayerTeam);
+    HookEvent("player_spawn", Event_PlayerSpawn);
+
     PTaH(PTaH_GiveNamedItemPre, Hook, OnGiveNamedItemPre);
 
     RegConsoleCmd("sm_selectweapon", Cmd_SelectWeapon);
@@ -151,14 +153,21 @@ void CheckUserDefault(int client) {
 
 public void Event_PlayerTeam(Event event, const char[] name, bool dontBroadcast) {
     int client = GetClientOfUserId(event.GetInt("userid"));
-    if (IsFakeClient(client) || IsClientSourceTV(client) || IsClientReplay(client)) {
+    if (!IsValidClient(client)) {
+        return;
+    }
+    if (AreClientCookiesCached(client)) {
+        CheckUserDefault(client);
+    }
+}
+
+public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast) {
+    int client = GetClientOfUserId(event.GetInt("userid"));
+    if (!IsValidClient(client)) {
         return;
     }
     if (cookieNoHintWhenEnter.GetInt(client, cvarShowHintByDefault.BoolValue ? 1 : 0)) {
         PrintToChat(client, "%t", "CSGO_WEAPONSELECT_HINT");
-    }
-    if (AreClientCookiesCached(client)) {
-        CheckUserDefault(client);
     }
 }
 
