@@ -124,10 +124,7 @@ void CheckUserDefault(int client) {
     // give users a reasonable default first
     char userPref[BASE_STR_LEN];
     cookiePowerfulPistol.Get(client, userPref, sizeof(userPref));
-    LogMessage("cookiePowerfulPistolresult: %s", userPref);
-    LogMessage("cookiePowerfulPistolstrlen: %d", strlen(userPref));
     if (!strlen(userPref)) {
-        LogMessage("hi");
         cookiePowerfulPistol.Set(client, DEAGLE_NAME);
     }
     cookieCTStartPistol.Get(client, userPref, sizeof(userPref));
@@ -602,8 +599,6 @@ bool PlayerHasWeapon(int client, const char[] weapon) {
         if (IsValidEdict(weap)) {
             char classname[BASE_STR_LEN];
             GetWeaponClassname(weap, classname, sizeof(classname));
-            LogMessage("classname: %s", classname);
-            LogMessage("weapon: %s", weapon);
             if (StrEqual(classname, weapon)) {
                 return true;
             }
