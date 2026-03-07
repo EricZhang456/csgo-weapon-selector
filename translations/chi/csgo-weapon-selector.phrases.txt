@@ -1,0 +1,87 @@
+"Phrases"
+{
+    "CSGO_WEAPONSELECT_HINT"
+    {
+        "chi"    "输入 !selectweapon 来选择武器"
+    }
+    "CSGO_WEAPONSELECT_PREF_MENU"
+    {
+        "chi"    "显示武器选择提示"
+    }
+    "CSGO_WEAPONSELECT_MENU"
+    {
+        "chi"    "选择武器"
+    }
+    "CSGO_WEAPONSELECT_MENU_SELECTED"
+    {
+        "chi"    "%s (已选择)"
+    }
+    "CSGO_WEAPONSELECT_POWERFUL_PISTOL"
+    {
+        "chi"    "沙漠之鹰 / R8 左轮手枪"
+    }
+    "CSGO_WEAPONSELECT_DEAGLE"
+    {
+        "chi"    "沙漠之鹰"
+    }
+    "CSGO_WEAPONSELECT_R8"
+    {
+        "chi"    "R8 左轮手枪"
+    }
+    "CSGO_WEAPONSELECT_CT_START_PISTOL"
+    {
+        "chi"    "P2000 / USP 消音版"
+    }
+    "CSGO_WEAPONSELECT_P2000"
+    {
+        "chi"    "P2000"
+    }
+    "CSGO_WEAPONSELECT_USPS"
+    {
+        "chi"    "USP 消音版"
+    }
+    "CSGO_WEAPONSELECT_AUTO_PISTOL_T"
+    {
+        "chi"    "CZ75 自动型 / Tec-9 (恐怖分子)"
+    }
+    "CSGO_WEAPONSELECT_AUTO_PISTOL_CT"
+    {
+        "chi"    "CZ75 自动型 / FN57 (反恐精英)"
+    }
+    "CSGO_WEAPONSELECT_CZ75"
+    {
+        "chi"    "CZ75-Auto"
+    }
+    "CSGO_WEAPONSELECT_TEC9"
+    {
+        "chi"    "Tec-9"
+    }
+    "CSGO_WEAPONSELECT_FIVESEVEN"
+    {
+        "chi"    "FN57"
+    }
+    "CSGO_WEAPONSELECT_MP"
+    {
+        "chi"    "MP7 / MP5-SD"
+    }
+    "CSGO_WEAPONSELECT_MP7"
+    {
+        "chi"    "MP7"
+    }
+    "CSGO_WEAPONSELECT_MP5SD"
+    {
+        "chi"    "MP5-SD"
+    }
+    "CSGO_WEAPONSELECT_AR15"
+    {
+        "chi"    "M4A4 / M4A1 消音版"
+    }
+    "CSGO_WEAPONSELECT_M4A4"
+    {
+        "chi"    "M4A4"
+    }
+    "CSGO_WEAPONSELECT_M4A1S"
+    {
+        "chi"    "M4A1 消音版"
+    }
+}
