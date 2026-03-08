@@ -10,8 +10,6 @@
 
 #define BASE_STR_LEN 128
 
-#define DEBUG
-
 ConVar cvarShowHintByDefault;
 ConVar cvarGameType;
 ConVar cvarGameMode;
@@ -566,7 +564,7 @@ int GetUserPrefWeapon(int client, const char[] weapon, char[] buffer, int len, c
         if (StrEqual(userPref, MP7_NAME)) {
             strcopy(buffer, len, MP7_CLASSNAME);
         } else if (StrEqual(userPref, MP5SD_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), MP5SD_CLASSNAME);
+            strcopy(buffer, len, MP5SD_CLASSNAME);
         } else {
             price = 0;
         }
@@ -594,12 +592,14 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon, bool deathm
         return GiveWeapon_Continue;
     }
 
-    int money = GetClientMoney(client);
-    if (money < price) {
-        return GiveWeapon_Block;
-    }
+    if (!deathmatch) {
+        int money = GetClientMoney(client);
+        if (money < price) {
+            return GiveWeapon_Block;
+        }
 
-    SetClientMoney(client, money - price);
+        SetClientMoney(client, money - price);
+    }
     char weaponClassName[BASE_STR_LEN] = "weapon_";
     StrCat(weaponClassName, sizeof(weaponClassName), targetWeapon);
     if (PlayerHasWeapon(client, weaponClassName)) {
@@ -610,15 +610,8 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon, bool deathm
         StrEqual(targetWeapon, M4A1_CLASSNAME) || StrEqual(targetWeapon, M4A4_CLASSNAME)) {
         dropSlot = 0;
     }
-    if (!deathmatch) {
-        PlayerDropWeapon(client, dropSlot);
-        GivePlayerItem(client, weaponClassName);
-    } else {
-        int weaponEnt = GetPlayerWeaponSlot(client, dropSlot);
-        SDKHooks_DropWeapon(client, weaponEnt);
-        AcceptEntityInput(weaponEnt, "Kill");
-        GivePlayerItem(client, weaponClassName);
-    }
+    PlayerDropWeapon(client, dropSlot);
+    GivePlayerItem(client, weaponClassName);
 #if defined DEBUG
     char clientName[MAX_NAME_LENGTH];
     GetClientName(client, clientName, sizeof(clientName));
