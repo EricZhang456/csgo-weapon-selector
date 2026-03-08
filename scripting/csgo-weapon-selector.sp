@@ -366,7 +366,7 @@ void ShowSecondMenu(int client, const char[] type) {
             menu.AddItem(USP_NAME, uspsDisplay, ITEMDRAW_DISABLED);
         } else {
             menu.AddItem(P2000_NAME, p2000);
-            menu.AddItem(USP_NAME, usps)
+            menu.AddItem(USP_NAME, usps);
         }
     } else if (StrEqual(type, "autoPistolT")) {
         cookieAutoPistolT.Get(client, userPref, sizeof(userPref));
@@ -522,7 +522,7 @@ void ApplyWeaponPref(int client, const char[] weapon) {
  */
 int GetUserPrefWeapon(int client, const char[] weapon, char[] buffer, int len, char[] userPrefRet = "", int userPrefLen = 0) {
     int price = 0;
-    char userPref[BASE_STR_LEN], targetWeapon[BASE_STR_LEN];
+    char userPref[BASE_STR_LEN];
     if (StrEqual(weapon, DEAGLE_CLASSNAME) || StrEqual(weapon, R8_CLASSNAME)) {
         cookiePowerfulPistol.Get(client, userPref, sizeof(userPref));
         if (StrEqual(userPref, DEAGLE_NAME)) {
