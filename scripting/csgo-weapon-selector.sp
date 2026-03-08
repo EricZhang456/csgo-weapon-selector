@@ -269,7 +269,7 @@ public Action OnGiveNamedItemPre(int iClient, char sClassname[64], CEconItemView
         return Plugin_Continue;
     }
     // not sure why i need this or i won't get a knife in dm
-    if (StrEqual(sClassname, "weapon_knife")) {
+    if (StrContains(sClassname, "weapon_knife") != -1) {
         return Plugin_Continue;
     }
     // hack to grant usp-s/p2000 on spawn
