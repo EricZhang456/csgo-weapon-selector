@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <sdkhooks>
 #include <sdktools>
 #include <cstrike>
 #include <clientprefs>
@@ -9,7 +10,11 @@
 
 #define BASE_STR_LEN 128
 
+#define DEBUG
+
 ConVar cvarShowHintByDefault;
+ConVar cvarGameType;
+ConVar cvarGameMode;
 
 Cookie cookieNoHintWhenEnter;
 
@@ -92,6 +97,8 @@ public void OnPluginStart() {
     LoadTranslations("csgo-weapon-selector.phrases");
 
     cvarShowHintByDefault = CreateConVar("sm_weapon_select_hint_default", "1", "Tell clients they can select weapons by default.");
+    cvarGameType = FindConVar("game_type");
+    cvarGameMode = FindConVar("game_mode");
 
     cookieNoHintWhenEnter = new Cookie("Show weapon select hint", "Toggle the weapon select hint when you enter the server.", CookieAccess_Public);
     cookiePowerfulPistol = new Cookie("Powerful pistol", "Power pistol pref", CookieAccess_Private);
@@ -212,11 +219,17 @@ public Action CS_OnBuyCommand(int client, const char[] weapon) {
     GetClientName(client, name, sizeof(name));
     LogMessage("CS_OnBuyCommand: %s (client id %d) wants to buy %s", name, client, weapon);
 #endif
-    if (!IsValidClient(client) || GetEntProp(client, Prop_Send, "m_bInBuyZone") == 0) {
-        return Plugin_Continue
+    if (!IsValidClient(client)) {
+        return Plugin_Continue;
     }
 
-    GiveWeaponAction action = OnClientWeaponGive(client, weapon);
+    bool deathmatch = cvarGameType.IntValue == 1 && cvarGameMode.IntValue == 2;
+    // m_bInBuyZone is always 0 for dm
+    if (!deathmatch && GetEntProp(client, Prop_Send, "m_bInBuyZone") == 0) {
+        return Plugin_Continue;
+    }
+
+    GiveWeaponAction action = OnClientWeaponGive(client, weapon, deathmatch);
     if (action == GiveWeapon_Handled) {
         return Plugin_Changed;
     }
@@ -254,6 +267,13 @@ public Action CS_OnGetWeaponPrice(int client, const char[] weapon, int &price) {
 }
 
 public Action OnGiveNamedItemPre(int iClient, char sClassname[64], CEconItemView &pItemView, bool &bIgnoredView, bool &bOriginNULL, float vecOrigin[3]) {
+    if (!IsValidClient(iClient)) {
+        return Plugin_Continue;
+    }
+    // not sure why i need this or i won't get a knife in dm
+    if (StrEqual(sClassname, "weapon_knife")) {
+        return Plugin_Continue;
+    }
     // hack to grant usp-s/p2000 on spawn
     if (GetClientTeam(iClient) == CS_TEAM_CT) {
         if (StrEqual(sClassname, ("weapon_" ... P2000_CLASSNAME)) || StrEqual(sClassname, ("weapon_" ... USP_CLASSNAME))) {
@@ -499,25 +519,28 @@ void ApplyWeaponPref(int client, const char[] weapon) {
     }
 }
 
-GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon) {
+/**
+ * @return price of the weapon
+ */
+int GetUserPrefWeapon(int client, const char[] weapon, char[] buffer, int len, char[] userPrefRet = "", int userPrefLen = 0) {
     int price = 0;
     char userPref[BASE_STR_LEN], targetWeapon[BASE_STR_LEN];
     if (StrEqual(weapon, DEAGLE_CLASSNAME) || StrEqual(weapon, R8_CLASSNAME)) {
         cookiePowerfulPistol.Get(client, userPref, sizeof(userPref));
         if (StrEqual(userPref, DEAGLE_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), DEAGLE_CLASSNAME);
+            strcopy(buffer, len, DEAGLE_CLASSNAME);
             price = DEAGLE_PRICE;
         } else if (StrEqual(userPref, R8_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), R8_CLASSNAME);
+            strcopy(buffer, len, R8_CLASSNAME);
             price = R8_PRICE;
         }
     } else if (StrEqual(weapon, P2000_CLASSNAME) || StrEqual(weapon, USP_CLASSNAME)) {
         price = USP_PRICE;
         cookieCTStartPistol.Get(client, userPref, sizeof(userPref));
         if (StrEqual(userPref, P2000_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), P2000_CLASSNAME);
+            strcopy(buffer, len, P2000_CLASSNAME);
         } else if (StrEqual(userPref, USP_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), USP_CLASSNAME);
+            strcopy(buffer, len, USP_CLASSNAME);
         } else {
             price = 0;
         }
@@ -529,11 +552,11 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon) {
             cookieAutoPistolCT.Get(client, userPref, sizeof(userPref));
         }
         if (StrEqual(userPref, CZ_T_NAME) || StrEqual(userPref, CZ_CT_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), CZ_CLASSNAME);
+            strcopy(buffer, len, CZ_CLASSNAME);
         } else if (StrEqual(userPref, FIVE_SEVEN_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), FIVE_SEVEN_CLASSNAME);
+            strcopy(buffer, len, FIVE_SEVEN_CLASSNAME);
         } else if (StrEqual(userPref, TEC9_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), TEC9_CLASSNAME);
+            strcopy(buffer, len, TEC9_CLASSNAME);
         } else {
             price = 0;
         }
@@ -541,7 +564,7 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon) {
         price = MP7_PRICE;
         cookieMP.Get(client, userPref, sizeof(userPref));
         if (StrEqual(userPref, MP7_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), MP7_CLASSNAME);
+            strcopy(buffer, len, MP7_CLASSNAME);
         } else if (StrEqual(userPref, MP5SD_NAME)) {
             strcopy(targetWeapon, sizeof(targetWeapon), MP5SD_CLASSNAME);
         } else {
@@ -550,13 +573,22 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon) {
     } else if (StrEqual(weapon, M4A4_CLASSNAME) || StrEqual(weapon, M4A1_CLASSNAME)) {
         cookieAR15.Get(client, userPref, sizeof(userPref));
         if (StrEqual(userPref, M4A4_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), M4A4_CLASSNAME);
+            strcopy(buffer, len, M4A4_CLASSNAME);
             price = M4A4_PRICE;
         } else if (StrEqual(userPref, M4A1_NAME)) {
-            strcopy(targetWeapon, sizeof(targetWeapon), M4A1_CLASSNAME);
+            strcopy(buffer, len, M4A1_CLASSNAME);
             price = M4A1_PRICE;
         }
     }
+    if (userPrefLen) {
+        strcopy(userPrefRet, userPrefLen, userPref);
+    }
+    return price;
+}
+
+GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon, bool deathmatch) {
+    char targetWeapon[BASE_STR_LEN], userPref[BASE_STR_LEN];
+    int price = GetUserPrefWeapon(client, weapon, targetWeapon, sizeof(targetWeapon), userPref, sizeof(userPref));
 
     if (!strlen(targetWeapon) || price == 0) {
         return GiveWeapon_Continue;
@@ -578,8 +610,15 @@ GiveWeaponAction OnClientWeaponGive(int client, const char[] weapon) {
         StrEqual(targetWeapon, M4A1_CLASSNAME) || StrEqual(targetWeapon, M4A4_CLASSNAME)) {
         dropSlot = 0;
     }
-    PlayerDropWeapon(client, dropSlot);
-    GivePlayerItem(client, weaponClassName);
+    if (!deathmatch) {
+        PlayerDropWeapon(client, dropSlot);
+        GivePlayerItem(client, weaponClassName);
+    } else {
+        int weaponEnt = GetPlayerWeaponSlot(client, dropSlot);
+        SDKHooks_DropWeapon(client, weaponEnt);
+        AcceptEntityInput(weaponEnt, "Kill");
+        GivePlayerItem(client, weaponClassName);
+    }
 #if defined DEBUG
     char clientName[MAX_NAME_LENGTH];
     GetClientName(client, clientName, sizeof(clientName));
