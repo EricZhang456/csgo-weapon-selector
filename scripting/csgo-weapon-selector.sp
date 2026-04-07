@@ -655,7 +655,7 @@ void PlayerDropWeapon(int client, int slot) {
     }
 }
 
-public bool IsValidClient(int client) {
+bool IsValidClient(int client) {
     return IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !IsClientReplay(client);
 }
 
