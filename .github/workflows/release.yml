@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  create-release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Create zip files for release
+        run: |
+          cd artifacts
+          for dir in */; do
+            cd "$dir"
+            zip -r "../${dir%/}.zip" .
+            cd ..
+          done
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
