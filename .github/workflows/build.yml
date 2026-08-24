@@ -39,11 +39,9 @@ jobs:
       - name: Package plugins
         run: |
           mkdir -p artifact/plugins
-          mkdir artifact/configs
           mkdir artifact/translations
           mv scripting/compiled/*.smx artifact/plugins/
           mv translations/* artifact/translations/
-          mv configs/* artifact/configs
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
