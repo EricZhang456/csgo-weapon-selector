@@ -98,7 +98,7 @@ public void OnPluginStart() {
     cvarGameType = FindConVar("game_type");
     cvarGameMode = FindConVar("game_mode");
 
-    cookieNoHintWhenEnter = new Cookie("Show weapon select hint", "Toggle the weapon select hint when you enter the server.", CookieAccess_Public);
+    cookieNoHintWhenEnter = new Cookie("Show weapon select hint", "Toggle the weapon select hint when you enter the server.", CookieAccess_Protected);
     cookiePowerfulPistol = new Cookie("Powerful pistol", "Power pistol pref", CookieAccess_Private);
     cookieCTStartPistol = new Cookie("CT start pistol", "CT start pistol pref", CookieAccess_Private);
     cookieAutoPistolT = new Cookie("Auto pistol T", "Auto pistol T pref", CookieAccess_Private);
